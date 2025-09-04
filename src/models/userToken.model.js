@@ -3,71 +3,71 @@
  * @description :: model of a database collection userTokens
  */
 
-import { mongoose,Schema } from "mongoose";
+import { mongoose, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import mongooseUniqueValidator from "mongoose-unique-validator";
 
 const myCustomLabels = {
-  totalDocs: 'itemCount',
-  docs: 'data',
-  limit: 'perPage',
-  page: 'currentPage',
-  nextPage: 'next',
-  prevPage: 'prev',
-  totalPages: 'pageCount',
-  pagingCounter: 'slNo',
-  meta: 'paginator',
+  totalDocs: "itemCount",
+  docs: "data",
+  limit: "perPage",
+  page: "currentPage",
+  nextPage: "next",
+  prevPage: "prev",
+  totalPages: "pageCount",
+  pagingCounter: "slNo",
+  meta: "paginator",
 };
 mongoosePaginate.paginate.options = { customLabels: myCustomLabels };
-const userTokenSchema =  Schema(
+const userTokenSchema = Schema(
   {
-    userId:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
 
-    token:{ type:String },
+    token: { type: String },
 
-    tokenExpiredTime:{ type:Date },
+    tokenExpiredTime: { type: Date },
 
-    isTokenExpired:{
-      type:Boolean,
-      default:false
+    isTokenExpired: {
+      type: Boolean,
+      default: false,
     },
 
-    isActive:{ type:Boolean },
+    isActive: { type: Boolean },
 
-    addedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    addedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
 
-    updatedBy:{
-      type:Schema.Types.ObjectId,
-      ref:'user'
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
 
-    createdAt:{ type:Date },
+    createdAt: { type: Date },
 
-    updatedAt:{ type:Date },
+    updatedAt: { type: Date },
 
-    isDeleted:{ type:Boolean }
-  }
-  ,{ 
-    timestamps: { 
-      createdAt: 'createdAt', 
-      updatedAt: 'updatedAt' 
-    } 
+    isDeleted: { type: Boolean },
+  },
+  {
+    timestamps: {
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    },
   }
 );
-userTokenSchema.pre('save', async function (next) {
+userTokenSchema.pre("save", async function (next) {
   this.isDeleted = false;
   this.isActive = true;
   next();
 });
 
-userTokenSchema.pre('insertMany', async function (next, docs) {
-  if (docs && docs.length){
+userTokenSchema.pre("insertMany", async function (next, docs) {
+  if (docs && docs.length) {
     for (let index = 0; index < docs.length; index++) {
       const element = docs[index];
       element.isDeleted = false;
@@ -77,13 +77,11 @@ userTokenSchema.pre('insertMany', async function (next, docs) {
   next();
 });
 
-userTokenSchema.method('toJSON', function () {
-  const {
-    _id, __v, ...object 
-  } = this.toObject({ virtuals:true });
+userTokenSchema.method("toJSON", function () {
+  const { _id, __v, ...object } = this.toObject({ virtuals: true });
   object.id = _id;
-     
+
   return object;
 });
 userTokenSchema.plugin(mongoosePaginate);
-export const UserTokens = mongoose.model('UserTokens',userTokenSchema);
+export const UserTokens = mongoose.model("UserTokens", userTokenSchema);

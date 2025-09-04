@@ -3,7 +3,7 @@
  * @description :: exports all handlers for response format.
  */
 import responseCode from "./responseCode.js";
-import responseBody from "./index.js"
+import responseBody from "./index.js";
 /**
  *
  * @param {obj} req : request from controller.
@@ -18,7 +18,9 @@ const responseHandler = (req, res, next) => {
     res.status(responseCode.success).json(responseBody.failure(data));
   };
   res.internalServerError = (data = {}) => {
-    res.status(responseCode.internalServerError).json(responseBody.internalServerError(data));
+    res
+      .status(responseCode.internalServerError)
+      .json(responseBody.internalServerError(data));
   };
   res.badRequest = (data = {}) => {
     res.status(responseCode.badRequest).json(responseBody.badRequest(data));
@@ -27,7 +29,9 @@ const responseHandler = (req, res, next) => {
     res.status(responseCode.success).json(responseBody.recordNotFound(data));
   };
   res.validationError = (data = {}) => {
-    res.status(responseCode.validationError).json(responseBody.validationError(data));
+    res
+      .status(responseCode.validationError)
+      .json(responseBody.validationError(data));
   };
   res.unAuthorized = (data = {}) => {
     res.status(responseCode.unAuthorized).json(responseBody.unAuthorized(data));
@@ -35,4 +39,4 @@ const responseHandler = (req, res, next) => {
   next();
 };
 
-export {responseHandler}
+export { responseHandler };

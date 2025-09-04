@@ -3,17 +3,20 @@
  * @description :: exports All authentication methods and controller for User
  */
 
-import { USER_TYPES,PLATFORM } from "../../../constants.js";
+import { USER_TYPES, PLATFORM } from "../../../constants.js";
 import { User } from "../../../models/user.model.js";
 import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { validateParamsWithJoi } from "../../../utils/validateRequest.js";
 import { schemaKeys } from "../../../utils/validation/userValidation.js";
-import { dbServiceCreate, dbServiceFindOne, dbServiceUpdateOne } from "../../../db/dbServices.js";
+import {
+  dbServiceCreate,
+  dbServiceFindOne,
+  dbServiceUpdateOne,
+} from "../../../db/dbServices.js";
 import * as common from "../../../utils/common.js";
 import { loginUser } from "../../../services/auth.services.js";
 import { isValidObjectId } from "mongoose";
 import dayjs from "dayjs";
-
 
 /**
  *
@@ -90,7 +93,7 @@ const register = asyncHandler(async (req, res) => {
  * @return {Object} : response for login {status, message, data}
  */
 
-const login = asyncHandler(async (req,res) => {
+const login = asyncHandler(async (req, res) => {
   let { email, password } = req.body;
 
   if (!email || !password) {
@@ -101,13 +104,8 @@ const login = asyncHandler(async (req,res) => {
   }
 
   let roleAccess = false;
-  let result = await loginUser(
-    email,
-    password,
-    PLATFORM.USERAPP,
-    roleAccess
-  );
-  console.log("result",result)
+  let result = await loginUser(email, password, PLATFORM.USERAPP, roleAccess);
+  console.log("result", result);
   if (result.flag) {
     return res.badRequest({ message: result.data });
   }
@@ -117,44 +115,38 @@ const login = asyncHandler(async (req,res) => {
   });
 });
 
-
-
 /**
  * @description : find document of User from table by id;
  * @param {Object} req : request including id in request params.
  * @param {Object} res : response contains document retrieved from table.
  * @return {Object} : found User. {status, message, data}
  */
-const getUser = asyncHandler(async(req,res) => {
+const getUser = asyncHandler(async (req, res) => {
   try {
-    if(!req.user.id){
-      return res.badRequest({ message: 'Insufficient request parameters! id is required.' });
+    if (!req.user.id) {
+      return res.badRequest({
+        message: "Insufficient request parameters! id is required.",
+      });
     }
-    if(!isValidObjectId(req.user.id)){
-      return res.validationError({message:"invalid object"})
+    if (!isValidObjectId(req.user.id)) {
+      return res.validationError({ message: "invalid object" });
     }
-
 
     let query = {
-      _id :req.user.id
+      _id: req.user.id,
+    };
+    let options = {};
+
+    let foundUser = await dbServiceFindOne(User, query, options);
+
+    if (!foundUser) {
+      return res.internalServerError();
     }
-    let options = {}
 
-    let foundUser = await dbServiceFindOne(User,query,options)
-
-    if(!foundUser){
-      return res.internalServerError()
-    }
-
-    return res.success({data : foundUser})
+    return res.success({ data: foundUser });
   } catch (error) {
-    return res.internalServerError({message : error.message})
+    return res.internalServerError({ message: error.message });
   }
-})
- 
+});
 
-export { 
-    register,
-    login,
-    getUser,
-};
+export { register, login, getUser };
